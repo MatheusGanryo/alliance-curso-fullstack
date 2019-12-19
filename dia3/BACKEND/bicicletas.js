@@ -16,7 +16,8 @@ router.get('/', async (req, res) => {
         resultado.push({
             codigo: row.codigo,
             ativo: row.ativo
-        });
+        })
+        ;
         console.log(resultado[-1]);
     }
     await client.end();
