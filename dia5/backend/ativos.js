@@ -14,7 +14,6 @@ router.get('/', async(req, res) => {
             codigo: row.codigo,
             descricao: row.descricao,
         });
-        console.log(resultado[-1])
     };
     await client.end();
     res.send(JSON.stringify(resultado));

@@ -4,7 +4,7 @@
             id="input-codigo"
             label="Código"
             label-for="txtCodigo"
-            description="Informe o código único da bicicleta"
+            description="Informe o código único do Ativo!"
             :disabled="!content.isNew"
         >
             <b-form-input
@@ -12,21 +12,22 @@
                 v-model="content.codigo"
                 type="text"
                 required
-                placeholder="código da bicicleta"
+                placeholder="Código do ativo"
                 @input="handleInput"
                 :disabled="!content.isNew"/>
         </b-form-group>
         <b-form-group
-            id="input-ativo"
-            label="Ativo"
-            label-for="chkAtivo"
-            description="Selecione se a bicicleta está disponível"
+            id="input-descricao"
+            label="Descricao"
+            label-for="chkDescricao"
+            description="Descreva o Ativo!"
         >
-            <b-form-checkbox
-                id="chkAtivo"
-                v-model="content.ativo"
+        <b-form-input
+                id="txtDescricao"
+                v-model="content.descricao"
+                type="text"
                 required
-                switch
+                placeholder="Descricao do ativo"
                 @input="handleInput"/>
         </b-form-group>
     </b-form>
@@ -39,7 +40,7 @@ export default {
         return {
             content: {
                 codigo: this.value.codigo,
-                ativo: (this.value.ativo ==='Y'),
+                descricao: this.value.descricao,
                 isNew: this.value.isNew
             }
 
@@ -49,7 +50,7 @@ export default {
         handleInput () {
             let retorno = {
                 codigo: this.content.codigo,
-                ativo: this.content.ativo ? 'Y' : 'N',
+                descricao: this.content.descricao,
                 isNew: this.content.isNew
             };
             this.$emit('input', retorno);

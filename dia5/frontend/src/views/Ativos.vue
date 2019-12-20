@@ -1,64 +1,72 @@
 <template>
   <div class="ativos">
-    <h1>Biciletas</h1>
+    <h1>Ativos</h1>
     <hr />
-    <b-button v-b-modal.criaBicicleta>
+    <b-button v-b-modal.criaAtivo>
        <font-awesome-icon icon="plus" /> <span>Adicionar</span>
     </b-button>
-    <b-table striped hover :items="bicicletas" :fields="fields">
-        <template slot="cell(ativo)" slot-scope="{ item: { ativo }}">
-            <font-awesome-icon
-                :icon="ativo === 'Y' ? 'check' : 'times'"
-            />
-        </template>
+    <b-table striped hover :items="ativos" :fields="fields">
+        
         <template slot="cell(actionDelete)" slot-scope="{ item: { codigo }}">
-            <b-button v-on:click="excluirBicicleta(codigo)">
+            <b-button v-on:click="deletaAtivo(codigo)">
                 <font-awesome-icon icon="trash" />
             </b-button>
         </template>
         <template slot="cell(actionEdit)" slot-scope="{ item }">
-            <b-button v-on:click="beforeEditaBicicleta(item)">
+            <b-button v-on:click="beforeEditaAtivo(item)">
                 <font-awesome-icon icon="pen" />
             </b-button>
         </template>
     </b-table>
-    <b-modal id="criaBicicleta"
-        title="Nova bicicleta"
+    <b-modal id="criaAtivo"
+        title="Novo Ativo"
         ok-title="Salvar"
         cancel-title="Cancelar"
-        @show="beforeNovaBicicleta"
-        @ok="saveNovaBicicleta">
-        <FormBicicleta v-model="bicicletaAtual"/>
+        @show="beforeNovoAtivo"
+        @ok="saveNovoAtivo">
+        <FormAtivo v-model="ativoAtual"/>
     </b-modal>
-    <b-modal id="editaBicicleta"
-        :title="'Alterar a bicileta - ' + bicicletaAtual.codigo"
+    <b-modal id="editaAtivo"
+        :title="'Alterar o Ativo - ' + ativoAtual.codigo"
         ok-title="Alterar"
         cancel-title="Cancelar"
-        @ok="editarBicicleta">
-        <FormBicicleta v-model="bicicletaAtual"/>
+        @ok="editarAtivo">
+        <FormAtivo v-model="ativoAtual"/>
+    </b-modal>
+    <b-modal id="deletaAtivo"
+        title="Deletar Ativo"
+        ok-title="Confirmar"
+        cancel-title="Cancelar"
+        @show="deletaAtivo"
+        @ok="deletaAtivo">
+        <FormAtivo v-model="ativoAtual"/>
     </b-modal>
 
   </div>
 </template>
 
 <script>
-import FormBicicleta from '../components/FormBicicleta';
+import FormAtivo from '../components/FormAtivo';
 import axios from 'axios';
 
 export default {
-    components: {FormBicicleta},
+    components: {FormAtivo},
     data: () => {
         return {
-            bicicletaAtual: {
-                codigo: '',
-                ativo: '',
+            ativoAtual: {
+                codigo: '', 
+                descricao: '',
                 isNew: true
             },
-            bicicletas: [],
+            ativos: [],
             fields: [
                 {
                     key: 'ativo',
                     label: ''
+                },
+                {
+                    key: 'descricao',
+                    label: 'Descricao'
                 },
                 {
                     key: 'codigo',
@@ -76,56 +84,68 @@ export default {
         }
     },
     methods: {
-        excluirBicicleta(codigo) {
-            return codigo;
+        async deletaAtivo() {
+
+            try {
+                await axios.delete(`http://localhost:3000/ativos/${this.ativoAtual.codigo}`);
+                console.log(this.ativoAtual+ "ativoAtual")
+                await this.deletaAtivo();
+            } catch(err) {
+                alert('Erro ao deletar ativo!');
+            }
+            
         },
-        beforeEditaBicicleta(bicicleta) {
-            this.bicicletaAtual = {
-                codigo: bicicleta.codigo,
-                ativo: bicicleta.ativo,
+        beforeEditaAtivo(ativo) {
+            this.ativoAtual = {
+                codigo: ativo.codigo,
+                descricao: ativo.descricao,
                 isNew: false
             }
-            this.$root.$emit('bv::show::modal', 'editaBicicleta');
+            this.$root.$emit('bv::show::modal', 'editaAtivo');
         },
 
-        async editarBicicleta() {
+        async editarAtivo() {
            let payload = {
-                ativo: this.bicicletaAtual.ativo
+                descricao: this.ativoAtual.descricao
             };
 
             try {
-                await axios.put(`http://localhost:3000/bicicletas/${this.bicicletaAtual.codigo}`, payload);
-                await this.carregaBicicletas();
+                await axios.put(`http://localhost:3000/ativos/${this.ativoAtual.codigo}`, payload);
+                await this.carregaAtivos();
             } catch(err) {
-                alert('erro ao atualizar a bicicleta');
+                alert('Erro ao atualizar ativo!');
             }
         },
-        async carregaBicicletas() {
-            this.bicicletas.splice(0, this.bicicletas.length);
-            let dados = await axios.get('http://localhost:3000/bicicletas/');
-            this.bicicletas.push(...dados.data);
+        async carregaAtivos() {
+            this.ativos.splice(0, this.ativos.length);
+            let dados = await axios.get('http://localhost:3000/ativos/');
+            this.ativos.push(...dados.data);
         },
-        beforeNovaBicicleta() {
-            this.bicicletaAtual.codigo = '';
-            this.bicicletaAtual.ativo = 'Y';
-            this.bicicletaAtual.isNew = true;
+        beforeNovoAtivo() {
+            this.ativoAtual.codigo = '';
+            this.ativoAtual.ativo = 'Y';
+            this.ativoAtual.isNew = true;
         },
-        async saveNovaBicicleta() {
+        beforeDeletaAtivo() {
+            this.ativoAtual.codigo = '';
+
+        },
+        async saveNovoAtivo() {
             let payload = {
-                codigo: this.bicicletaAtual.codigo,
-                ativo: this.bicicletaAtual.ativo
+                codigo: this.ativoAtual.codigo,
+                descricao: this.ativoAtual.descricao
             };
 
             try {
-                await axios.post('http://localhost:3000/bicicletas/', payload);
-                await this.carregaBicicletas();
+                await axios.post('http://localhost:3000/ativos/', payload);
+                await this.carregaAtivos();
             } catch(err) {
-                alert('erro ao inserir a bicicleta');
+                alert('Erro ao inserir o ativo!');
             }
         }
     },
     async mounted() {
-        await this.carregaBicicletas();
+        await this.carregaAtivos();
     }
 }
 </script>
