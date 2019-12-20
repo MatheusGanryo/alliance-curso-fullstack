@@ -88,7 +88,6 @@ export default {
 
             try {
                 await axios.delete(`http://localhost:3000/ativos/${this.ativoAtual.codigo}`);
-                console.log(this.ativoAtual+ "ativoAtual")
                 await this.deletaAtivo();
             } catch(err) {
                 alert('Erro ao deletar ativo!');
